@@ -4,9 +4,9 @@ pipeline {
   stages {
     stage('build') {
       steps {
-        sh 'echo env:'
-        sh 'env'
-        sh 'ant -f build.xml -v'
+        bash 'echo env:'
+        bash 'env'
+        bash 'ant -f build.xml -v'
       }
     }
   }
