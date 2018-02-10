@@ -32,7 +32,7 @@ pipeline {
                 sh "cp dist/rectangle_${env.BUILD_NUMBER}.jar /var/www/html/rectangles/all/"
             }
         }
-        // Pull from the master (slave is "centos", but not really)
+        // Slave, centos, pulls from the master (slave is labeled "centos", but not really)
         stage('deploy centos') {
             agent {
                 label 'centos'
@@ -47,7 +47,6 @@ pipeline {
                 label 'centos'
             }
             steps {
-                sh "wget http://192.168.0.202/rectangles/all/rectangle_${env.BUILD_NUMBER}.jar"
                 sh "java -jar rectangle_${env.BUILD_NUMBER}.jar 3 4"
             }
         }
