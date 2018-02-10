@@ -1,9 +1,9 @@
 pipeline {
     agent none
 
-//    options {
-//        buildDiscarder(logRotator(numToKeepStr: '2', artifactNumToKeepStr: '1'))
-//    }
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '2', artifactNumToKeepStr: '1'))
+    }
 
     stages {
         stage('Unit Tests') {
@@ -15,20 +15,13 @@ pipeline {
                 junit 'reports/result.xml'
             }
         }
+        // Always build on debian (for us, this is the master)
         stage('build') {
             agent {
-                label 'apache'
+                label 'apache&&debian'
             }
             steps {
                 sh '/usr/local/ant/bin/ant -f build.xml -v'
-            }
-        }
-        stage('deploy centos') {
-            agent {
-                label 'centos'
-            }
-            steps {
-                sh "cp dist/rectangle_${env.BUILD_NUMBER}.jar /var/www/html/rectangles/all/"
             }
         }
         stage('deploy debian') {
@@ -37,6 +30,16 @@ pipeline {
             }
             steps {
                 sh "cp dist/rectangle_${env.BUILD_NUMBER}.jar /var/www/html/rectangles/all/"
+            }
+        }
+        // Pull from the master (slave is "centos", but not really)
+        stage('deploy centos') {
+            agent {
+                label 'centos'
+            }
+            steps {
+                sh "wget http://192.168.0.202/rectangles/all/rectangle_${env.BUILD_NUMBER}.jar"
+                sh "cp rectangle_${env.BUILD_NUMBER}.jar /var/www/html/rectangles/all/"
             }
         }
         stage("Running on CentOS") {
