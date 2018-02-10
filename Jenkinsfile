@@ -25,7 +25,15 @@ pipeline {
         }
         stage('deploy') {
             agent {
-                label 'apache'
+                label 'apache centos'
+            }
+            steps {
+                sh "cp dist/rectangle_${env.BUILD_NUMBER}.jar /var/www/html/rectangles/all/"
+            }
+        }
+        stage('deploy') {
+            agent {
+                label 'apache debian'
             }
             steps {
                 sh "cp dist/rectangle_${env.BUILD_NUMBER}.jar /var/www/html/rectangles/all/"
@@ -33,7 +41,7 @@ pipeline {
         }
         stage("Running on CentOS") {
             agent {
-                label 'CentOS'
+                label 'centos'
             }
             steps {
                 sh "wget http://192.168.0.202/rectangles/all/rectangle_${env.BUILD_NUMBER}.jar"
@@ -42,7 +50,7 @@ pipeline {
         }
         stage("Running on Debian") {
             agent {
-                label 'Debian'
+                label 'debian'
             }
             steps {
                 sh "wget http://192.168.0.202/rectangles/all/rectangle_${env.BUILD_NUMBER}.jar"
