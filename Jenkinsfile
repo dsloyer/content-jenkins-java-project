@@ -23,6 +23,11 @@ pipeline {
             steps {
                 sh '/usr/local/ant/bin/ant -f build.xml -v'
             }
+            post {
+                always {
+                    archiveArtifacts artifacts: 'dist/*.jar', fingerprint: true
+                }
+            }
         }
         stage('deploy debian') {
             agent {
@@ -58,12 +63,6 @@ pipeline {
                 sh "wget http://192.168.0.202/rectangles/all/rectangle_${env.BUILD_NUMBER}.jar"
                 sh "java -jar rectangle_${env.BUILD_NUMBER}.jar 3 4"
             }
-        }
-    }
-
-    post {
-        always {
-            archiveArtifacts artifacts: 'dist/*.jar', fingerprint: true
         }
     }
 }
