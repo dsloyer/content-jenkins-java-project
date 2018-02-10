@@ -21,7 +21,7 @@ pipeline {
         }
         stage('deploy') {
             steps {
-                sh 'echo env.BUILD_NUMBER: ${env.BUILD_NUMBER}
+                sh 'echo env.BUILD_NUMBER: ${env.BUILD_NUMBER}'
                 sh 'cp dist/rectangle_${env.BUILD_NUMBER}.jar /var/www/html/rectangles/all/'
             }
         }
