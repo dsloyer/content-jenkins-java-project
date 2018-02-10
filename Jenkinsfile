@@ -25,7 +25,7 @@ pipeline {
         }
         stage('deploy centos') {
             agent {
-                label 'apache centos'
+                label 'centos'
             }
             steps {
                 sh "cp dist/rectangle_${env.BUILD_NUMBER}.jar /var/www/html/rectangles/all/"
@@ -33,7 +33,7 @@ pipeline {
         }
         stage('deploy debian') {
             agent {
-                label 'apache debian'
+                label 'debian'
             }
             steps {
                 sh "cp dist/rectangle_${env.BUILD_NUMBER}.jar /var/www/html/rectangles/all/"
