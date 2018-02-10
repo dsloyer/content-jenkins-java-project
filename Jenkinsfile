@@ -23,7 +23,7 @@ pipeline {
                 sh '/usr/local/ant/bin/ant -f build.xml -v'
             }
         }
-        stage('deploy') {
+        stage('deploy centos') {
             agent {
                 label 'apache centos'
             }
@@ -31,7 +31,7 @@ pipeline {
                 sh "cp dist/rectangle_${env.BUILD_NUMBER}.jar /var/www/html/rectangles/all/"
             }
         }
-        stage('deploy') {
+        stage('deploy debian') {
             agent {
                 label 'apache debian'
             }
