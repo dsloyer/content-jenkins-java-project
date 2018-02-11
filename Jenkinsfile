@@ -10,27 +10,6 @@ pipeline {
     }
 
     stages {
-        stage('Say Hello') {
-            agent any
-
-            steps {
-                sayHello 'Welcome!'
-            }
-        }
-        // stage('Git Information') {
-        //     agent any
-        //
-        //     steps {
-        //         echo "Current Branch: ${env.BRANCH_NAME}"
-        //
-        //         script {
-        //             def myLib = new dsloyer.git.gitStuff();
-        //
-        //             echo "My Commit: ${myLib.gitCommit("${env.WORKSPACE}/.git")}"
-        //         }
-        //     }
-        // }
-
         // Invoke junit to run unit tests on 
         stage('Unit Tests') {
             agent {
