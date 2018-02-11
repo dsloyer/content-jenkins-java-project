@@ -16,7 +16,7 @@ pipeline {
                 junit 'reports/result.xml'
             }
         }
-        // Always build on (for us, this is the master)
+        // Always build on (for us, this is the Jenkins Master)
         stage('Build') {
             agent {
                 label 'apache'
@@ -32,7 +32,7 @@ pipeline {
         }
         // deploy the jar file on Apache on our Master, which has Apache, and is Debian
         // We want to support wget's from this server, by placing artifacts in the apache website
-        stage('Deploy to apache(master)') {
+        stage('Deploy to apache(Jenkins Master)') {
             agent {
                 label 'apache'
             }
@@ -40,7 +40,7 @@ pipeline {
                 sh "cp dist/rectangle_${env.BUILD_NUMBER}.jar /var/www/html/rectangles/all/"
             }
         }
-        // OK, now the jar file is in the master's web server, in rectangles/all
+        // OK, now the jar file is in the Jenkins Master's web server, in rectangles/all
 
         stage("Run on Debian") {
             agent {
