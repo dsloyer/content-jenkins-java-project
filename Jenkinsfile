@@ -65,17 +65,21 @@ pipeline {
                 sh "java -jar rectangle_${env.BUILD_NUMBER}.jar 3 4"
             }
         }
+
+        // When functional tests (above) succeed, and branch is "dev", copy artifact to green directory in website
         stage('Promote to Green') {
             agent {
                 label 'apache'
             }
             when {
-                branch 'master'
+                branch 'dev'
             }
             steps {
                 sh "cp /var/www/html/rectangles/all/rectangle_${env.BUILD_NUMBER}.jar /var/www/html/rectangles/green/rectangle_${env.BUILD_NUMBER}.jar"
             }
         }
+
+        // When functional tests (above) succeed, and branch is "dev", copy artifact to green directory in website
         stage('Promote Dev Branch to Master') {
             agent {
                 label 'apache'
@@ -88,7 +92,7 @@ pipeline {
                 sh 'git stash'
                 echo "Checking Out Dev Branch"
                 sh 'git checkout dev'
-                echo 'Checking Out Master Branch'
+                echo 'Pulling Branch'
                 sh 'git pull origin'
                 sh 'git checkout master'
                 echo 'Merging Dev into Master Branch'
@@ -99,16 +103,16 @@ pipeline {
                 sh "git tag rectangle.${env.BUILD_NUMBER}"
                 sh "git push origin rectangle.${env.BUILD_NUMBER}"
             }
-            post {
-                success {
-                    emailext(
-                        subject: "${env.JOB_NAME} [${env.BUILD_NUMBER}] Dev Promoted to Master",
-                        body: """<p>'${env.JOB_NAME} [${env.BUILD_NUMBER}]' Dev Promoted to Master":</p>
-                        <p>Check console output at &QUOT;<a href='${env.BUILD_URL}'>${env.JOB_NAME} [${env.BUILD_NUMBER}]</a>&QUOT;</p>""",
-                        to: "dsloyer@gmail.com"
-                    )
-                }
-            }
+            // post {
+            //     success {
+            //         emailext(
+            //             subject: "${env.JOB_NAME} [${env.BUILD_NUMBER}] Dev Promoted to Master",
+            //             body: """<p>'${env.JOB_NAME} [${env.BUILD_NUMBER}]' Dev Promoted to Master":</p>
+            //             <p>Check console output at &QUOT;<a href='${env.BUILD_URL}'>${env.JOB_NAME} [${env.BUILD_NUMBER}]</a>&QUOT;</p>""",
+            //             to: "dsloyer@gmail.com"
+            //         )
+            //     }
+            // }
         }
     }
 }
