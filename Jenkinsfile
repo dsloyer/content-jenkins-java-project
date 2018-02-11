@@ -37,7 +37,8 @@ pipeline {
                 label 'apache'
             }
             steps {
-                sh "cp dist/rectangle_${env.BUILD_NUMBER}.jar /var/www/html/rectangles/all/"
+                sh "mkdir /var/www/html/rectangles/all/${env.BRANCH_NAME}/"
+                sh "cp dist/rectangle_${env.BUILD_NUMBER}.jar /var/www/html/rectangles/all/${env.BRANCH_NAME}/"
             }
         }
         // OK, now the jar file is in the Jenkins Master's web server, in rectangles/all
@@ -48,7 +49,7 @@ pipeline {
             }
             steps {
                 // copy the jar file from the Jenkins Master's website, and run it
-                sh "wget http://192.168.0.202/rectangles/all/rectangle_${env.BUILD_NUMBER}.jar"
+                sh "wget http://192.168.0.202/rectangles/all/${env.BRANCH_NAME}/rectangle_${env.BUILD_NUMBER}.jar"
                 sh "java -jar rectangle_${env.BUILD_NUMBER}.jar 3 4"
             }
         }
@@ -60,7 +61,7 @@ pipeline {
                 docker 'nimmis/java-centos:openjdk-8-jre'
             }
             steps {
-                sh "wget http://192.168.0.202/rectangles/all/rectangle_${env.BUILD_NUMBER}.jar"
+                sh "wget http://192.168.0.202/rectangles/all/${env.BRANCH_NAME}/rectangle_${env.BUILD_NUMBER}.jar"
                 sh "java -jar rectangle_${env.BUILD_NUMBER}.jar 3 4"
             }
         }
@@ -69,11 +70,45 @@ pipeline {
                 label 'apache'
             }
             when {
-                branch 'dev'
+                branch 'master'
             }
             steps {
-                sh "cp /var/www/html/rectangles/all/rectangle_${env.BUILD_NUMBER}.jar /var/www/html/rectangles/green/rectangle_${env.BUILD_NUMBER}.jar"
+                sh "cp /var/www/html/rectangles/all/${env.BRANCH_NAME}/rectangle_${env.BUILD_NUMBER}.jar /var/www/html/rectangles/green/rectangle_${env.BUILD_NUMBER}.jar"
             }
         }
+    }
+    stage('Promote Dev Branch to Master') {
+      agent {
+        label 'apache'
+      }
+      when {
+        branch 'master'
+      }
+      steps {
+        echo "Stashing Any Local Changes"
+        sh 'git stash'
+        echo "Checking Out Dev Branch"
+        sh 'git checkout development'
+        echo 'Checking Out Master Branch'
+        sh 'git pull origin'
+        sh 'git checkout master'
+        echo 'Merging Dev into Master Branch'
+        sh 'git merge dev'
+        echo 'Pushing to Origin Master'
+        sh 'git push origin master'
+        echo 'Tagging the Release'
+        sh "git tag rectangle.${env.BUILD_NUMBER}"
+        sh "git push origin rectangle.${env.BUILD_NUMBER}"
+      }
+      post {
+        success {
+          emailext(
+            subject: "${env.JOB_NAME} [${env.BUILD_NUMBER}] Dev Promoted to Master",
+            body: """<p>'${env.JOB_NAME} [${env.BUILD_NUMBER}]' Dev Promoted to Master":</p>
+            <p>Check console output at &QUOT;<a href='${env.BUILD_URL}'>${env.JOB_NAME} [${env.BUILD_NUMBER}]</a>&QUOT;</p>""",
+            to: "dsloyer@gmail.com"
+          )
+        }
+      }
     }
 }
