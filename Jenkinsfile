@@ -100,8 +100,8 @@ pipeline {
                 echo 'Pushing to Origin Master'
                 sh 'git push origin master'
                 echo 'Tagging the Release'
-                sh "git tag rectangle.${env.BUILD_NUMBER}"
-                sh "git push origin rectangle.${env.BUILD_NUMBER}"
+                sh "git tag rectangle_${env.BUILD_NUMBER}"
+                sh "git push origin rectangle_${env.BUILD_NUMBER}"
             }
             // post {
             //     success {
