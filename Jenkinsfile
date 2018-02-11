@@ -54,7 +54,7 @@ pipeline {
         }
 
         // For Centos, instantiate a Docker container -- Centos with JRE --
-        // then pull the jar file from the Jenkins Master, and run it
+        // then pull the jar file from the Jenkins Master, and test it
         stage("Test on CentOS") {
             agent {
                 docker 'nimmis/java-centos:openjdk-8-jre'
