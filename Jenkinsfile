@@ -29,6 +29,8 @@ pipeline {
                 }
             }
         }
+        // deploy the jar file on Apache on our Master, which has Apache, and is Debian
+        // We want to support wget's from this server
         stage('deploy debian') {
             agent {
                 label 'debian'
@@ -37,27 +39,24 @@ pipeline {
                 sh "cp dist/rectangle_${env.BUILD_NUMBER}.jar /var/www/html/rectangles/all/"
             }
         }
-        // Slave, centos, pulls from the master (slave is labeled "centos", but not really)
-        stage('deploy centos') {
-            agent {
-                label 'centos'
-            }
-            steps {
-                sh "wget http://192.168.0.202/rectangles/all/rectangle_${env.BUILD_NUMBER}.jar"
-                sh "cp rectangle_${env.BUILD_NUMBER}.jar /var/www/html/rectangles/all/"
-            }
-        }
-        stage("Running on CentOS") {
-            agent {
-                label 'centos'
-            }
-            steps {
-                sh "java -jar rectangle_${env.BUILD_NUMBER}.jar 3 4"
-            }
-        }
+        // OK, now the jar file is in the master's web server, in rectangles/all
+
         stage("Running on Debian") {
             agent {
                 label 'debian'
+            }
+            steps {
+                // copy the jar file from the master's website, and run it
+                sh "wget http://192.168.0.202/rectangles/all/rectangle_${env.BUILD_NUMBER}.jar"
+                sh "java -jar rectangle_${env.BUILD_NUMBER}.jar 3 4"
+            }
+        }
+
+        // For Centos, instantiate a Centos container with JRE, then
+        // pull the jar file from the master
+        stage("Test on CentOS") {
+            agent {
+                docker 'nimmis/java-centos:openjdk-8-jre'
             }
             steps {
                 sh "wget http://192.168.0.202/rectangles/all/rectangle_${env.BUILD_NUMBER}.jar"
