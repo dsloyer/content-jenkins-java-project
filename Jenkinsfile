@@ -6,6 +6,7 @@ pipeline {
     }
 
     stages {
+        // Invoke junit to run unit tests on 
         stage('Unit Tests') {
             agent {
                 label 'apache'
@@ -15,10 +16,10 @@ pipeline {
                 junit 'reports/result.xml'
             }
         }
-        // Always build on debian (for us, this is the master)
+        // Always build on (for us, this is the master)
         stage('Build') {
             agent {
-                label 'apache&&debian'
+                label 'apache'
             }
             steps {
                 sh '/usr/local/ant/bin/ant -f build.xml -v'
@@ -30,10 +31,10 @@ pipeline {
             }
         }
         // deploy the jar file on Apache on our Master, which has Apache, and is Debian
-        // We want to support wget's from this server
-        stage('Deploy to Debian(master)') {
+        // We want to support wget's from this server, by placing artifacts in the apache website
+        stage('Deploy to apache(master)') {
             agent {
-                label 'debian'
+                label 'apache'
             }
             steps {
                 sh "cp dist/rectangle_${env.BUILD_NUMBER}.jar /var/www/html/rectangles/all/"
@@ -43,7 +44,7 @@ pipeline {
 
         stage("Run on Debian") {
             agent {
-                label 'debian'
+                label 'apache'
             }
             steps {
                 // copy the jar file from the master's website, and run it
@@ -52,8 +53,8 @@ pipeline {
             }
         }
 
-        // For Centos, instantiate a Centos container with JRE, then
-        // pull the jar file from the master
+        // For Centos, instantiate a Docker container -- Centos with JRE --
+        // then pull the jar file from the master, and run it
         stage("Test on CentOS") {
             agent {
                 docker 'nimmis/java-centos:openjdk-8-jre'
@@ -61,6 +62,17 @@ pipeline {
             steps {
                 sh "wget http://192.168.0.202/rectangles/all/rectangle_${env.BUILD_NUMBER}.jar"
                 sh "java -jar rectangle_${env.BUILD_NUMBER}.jar 3 4"
+            }
+        }
+        stage('Promote to Green') {
+            agent {
+                label 'apache'
+            }
+            when {
+                branch 'master'
+            }
+            steps {
+                sh "cp /var/www/html/rectangles/all/${env.BRANCH_NAME}/rectangle_${env.BUILD_NUMBER}.jar /var/www/html/rectangles/green/rectangle_${env.BUILD_NUMBER}.jar"
             }
         }
     }
