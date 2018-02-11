@@ -47,14 +47,14 @@ pipeline {
                 label 'apache'
             }
             steps {
-                // copy the jar file from the master's website, and run it
+                // copy the jar file from the Jenkins Master's website, and run it
                 sh "wget http://192.168.0.202/rectangles/all/rectangle_${env.BUILD_NUMBER}.jar"
                 sh "java -jar rectangle_${env.BUILD_NUMBER}.jar 3 4"
             }
         }
 
         // For Centos, instantiate a Docker container -- Centos with JRE --
-        // then pull the jar file from the master, and run it
+        // then pull the jar file from the Jenkins Master, and run it
         stage("Test on CentOS") {
             agent {
                 docker 'nimmis/java-centos:openjdk-8-jre'
