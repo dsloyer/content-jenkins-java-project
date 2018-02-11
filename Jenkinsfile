@@ -16,7 +16,7 @@ pipeline {
             }
         }
         // Always build on debian (for us, this is the master)
-        stage('build') {
+        stage('Build') {
             agent {
                 label 'apache&&debian'
             }
@@ -31,7 +31,7 @@ pipeline {
         }
         // deploy the jar file on Apache on our Master, which has Apache, and is Debian
         // We want to support wget's from this server
-        stage('deploy debian') {
+        stage('Deploy to Debian(master)') {
             agent {
                 label 'debian'
             }
@@ -41,7 +41,7 @@ pipeline {
         }
         // OK, now the jar file is in the master's web server, in rectangles/all
 
-        stage("Running on Debian") {
+        stage("Run on Debian") {
             agent {
                 label 'debian'
             }
