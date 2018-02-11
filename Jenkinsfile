@@ -1,6 +1,10 @@
 pipeline {
     agent none
 
+    environment {
+      MAJOR_VERSION = 1
+    }
+
     options {
         buildDiscarder(logRotator(numToKeepStr: '4', artifactNumToKeepStr: '4'))
     }
@@ -13,19 +17,20 @@ pipeline {
                 sayHello 'Welcome!'
             }
         }
-        stage('Git Information') {
-            agent any
+        // stage('Git Information') {
+        //     agent any
+        //
+        //     steps {
+        //         echo "Current Branch: ${env.BRANCH_NAME}"
+        //
+        //         script {
+        //             def myLib = new dsloyer.git.gitStuff();
+        //
+        //             echo "My Commit: ${myLib.gitCommit("${env.WORKSPACE}/.git")}"
+        //         }
+        //     }
+        // }
 
-            steps {
-                echo "Current Branch: ${env.BRANCH_NAME}"
-
-                script {
-                    def myLib = new dsloyer.git.gitStuff();
-
-                    echo "My Commit: ${myLib.gitCommit("${env.WORKSPACE}/.git")}"
-                }
-            }
-        }
         // Invoke junit to run unit tests on 
         stage('Unit Tests') {
             agent {
