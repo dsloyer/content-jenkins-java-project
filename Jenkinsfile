@@ -121,7 +121,8 @@ pipeline {
         }
     }
     post {
-        failure {
+        // failure {
+        success {
             emailext(
                 subject: "${env.JOB_NAME} [${env.BUILD_NUMBER}] Failed!",
                 body: """<p>'${env.JOB_NAME} [${env.BUILD_NUMBER}]' Failed!":</p>
@@ -131,4 +132,3 @@ pipeline {
         }
     }
 }
-
