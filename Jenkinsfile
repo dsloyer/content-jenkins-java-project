@@ -42,7 +42,7 @@ pipeline {
             }
             steps {
                 sh "mkdir -p /var/www/html/rectangles/all/${env.BRANCH_NAME}"
-                sh "cp dist/rectangle_${env.BUILD_NUMBER}.jar /var/www/html/rectangles/all/${env.BRANCH_NAME}/"
+                sh "cp dist/rectangle_${MAJOR_VERSION}.${env.BUILD_NUMBER}.jar /var/www/html/rectangles/all/${env.BRANCH_NAME}/"
             }
         }
         // OK, now the jar file is in the Jenkins Master's web server, in rectangles/all
@@ -53,8 +53,8 @@ pipeline {
             }
             steps {
                 // copy the jar file from the Jenkins Master's website, and run it
-                sh "wget http://192.168.0.202/rectangles/all/${env.BRANCH_NAME}/rectangle_${env.BUILD_NUMBER}.jar"
-                sh "java -jar rectangle_${env.BUILD_NUMBER}.jar 3 4"
+                sh "wget http://192.168.0.202/rectangles/all/${env.BRANCH_NAME}/rectangle_${MAJOR_VERSION}.${env.BUILD_NUMBER}.jar"
+                sh "java -jar rectangle_${MAJOR_VERSION}.${env.BUILD_NUMBER}.jar 3 4"
             }
         }
 
@@ -65,8 +65,8 @@ pipeline {
                 docker 'nimmis/java-centos:openjdk-8-jre'
             }
             steps {
-                sh "wget http://192.168.0.202/rectangles/all/${env.BRANCH_NAME}/rectangle_${env.BUILD_NUMBER}.jar"
-                sh "java -jar rectangle_${env.BUILD_NUMBER}.jar 3 4"
+                sh "wget http://192.168.0.202/rectangles/all/${env.BRANCH_NAME}/rectangle_${MAJOR_VERSION}.${env.BUILD_NUMBER}.jar"
+                sh "java -jar rectangle_${MAJOR_VERSION}.${env.BUILD_NUMBER}.jar 3 4"
             }
         }
 
@@ -79,7 +79,7 @@ pipeline {
                 branch 'master'
             }
             steps {
-                sh "cp /var/www/html/rectangles/all/${env.BRANCH_NAME}/rectangle_${env.BUILD_NUMBER}.jar /var/www/html/rectangles/green/rectangle_${env.BUILD_NUMBER}.jar"
+                sh "cp /var/www/html/rectangles/all/${env.BRANCH_NAME}/rectangle_${MAJOR_VERSION}.${env.BUILD_NUMBER}.jar /var/www/html/rectangles/green/rectangle_${MAJOR_VERSION}.${env.BUILD_NUMBER}.jar"
             }
         }
 
@@ -105,14 +105,14 @@ pipeline {
                 sh 'git push origin master'
                 echo 'Tagging the Release'
                 sh "git tag rectangle_${env.BUILD_NUMBER}"
-                sh "git push origin rectangle_${env.BUILD_NUMBER}"
+                sh "git push origin rectangle_${MAJOR_VERSION}.${env.BUILD_NUMBER}"
             }
             // post {
             //     success {
             //         emailext(
-            //             subject: "${env.JOB_NAME} [${env.BUILD_NUMBER}] Dev Promoted to Master",
-            //             body: """<p>'${env.JOB_NAME} [${env.BUILD_NUMBER}]' Dev Promoted to Master":</p>
-            //             <p>Check console output at &QUOT;<a href='${env.BUILD_URL}'>${env.JOB_NAME} [${env.BUILD_NUMBER}]</a>&QUOT;</p>""",
+            //             subject: "${env.JOB_NAME} ${env.MAJOR_VERSION}] [${env.BUILD_NUMBER}] Dev Promoted to Master",
+            //             body: """<p>'${env.JOB_NAME} ${env.MAJOR_VERSION}] [${env.BUILD_NUMBER}]' Dev Promoted to Master":</p>
+            //             <p>Check console output at &QUOT;<a href='${env.BUILD_URL}'>${env.JOB_NAME} ${env.MAJOR_VERSION}] [${env.BUILD_NUMBER}]</a>&QUOT;</p>""",
             //             to: "dsloyer@gmail.com"
             //         )
             //     }
